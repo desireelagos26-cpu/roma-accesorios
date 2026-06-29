@@ -701,7 +701,7 @@ const DEMO = [
   { nombre: 'Broche Mariposa', precio: 4990, categoria: 'Cabello', descripcion: 'Esmalte colorido, varios modelos', foto: '', stock: 'si' },
 ];
 
-// ─── CARGAR SHEET (múltiples proxies para funcionar en Google Sites) ───
+// ─── CARGAR SHEET via JSONP nativo de Google (sin proxies externos) ───
 const SHEET_PUBLISHED_ID = '2PACX-1vTyG7kO-AfOglgjZwgxA7mS6rfDMpMx_eH3-wOAsYwQWDmc12BucENVozoVxWYRE4SsppD8mxlkVKRH';
 
 function loadSheet() {
@@ -714,30 +714,39 @@ function loadSheet() {
 
 function loadFromPublishedCSV() {
   showSpinner();
-  const csvUrl = `https://docs.google.com/spreadsheets/d/e/${SHEET_PUBLISHED_ID}/pub?output=csv`;
-  const proxies = [
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`,
-    `https://corsproxy.io/?${encodeURIComponent(csvUrl)}`,
-    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(csvUrl)}`,
-  ];
-  function tryProxy(i) {
-    if (i >= proxies.length) {
-      showError('No se pudo cargar el catálogo. Verifica que tu Google Sheets esté publicado en la web.');
-      return;
+  const old = document.getElementById('jsonp-sheet');
+  if (old) old.remove();
+  if (window.__sheetTimeout) clearTimeout(window.__sheetTimeout);
+
+  window.sheetCallback = function(data) {
+    clearTimeout(window.__sheetTimeout);
+    try {
+      const cols = data.table.cols.map(c => (c.label || '').toLowerCase().trim());
+      const rows = data.table.rows;
+      const products = rows.map(row => {
+        const obj = {};
+        cols.forEach((col, i) => { obj[col] = row.c[i] ? String(row.c[i].v ?? '').trim() : ''; });
+        return obj;
+      }).filter(p => p.nombre);
+      if (!products.length) throw new Error('sin datos');
+      allProducts = products;
+      buildFilters();
+      renderProducts();
+      showToast('✅ Catálogo cargado');
+    } catch(e) {
+      showError('No se pudo leer el catálogo. Verifica que la hoja esté publicada.');
     }
-    fetch(proxies[i])
-      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
-      .then(text => {
-        const products = parseCSV(text);
-        if (!products.length) throw new Error();
-        allProducts = products;
-        buildFilters();
-        renderProducts();
-        showToast('✅ Catálogo cargado');
-      })
-      .catch(() => tryProxy(i + 1));
-  }
-  tryProxy(0);
+  };
+
+  window.__sheetTimeout = setTimeout(() => {
+    showError('No se pudo conectar con Google Sheets (tiempo agotado).');
+  }, 8000);
+
+  const script = document.createElement('script');
+  script.id = 'jsonp-sheet';
+  script.src = `https://docs.google.com/spreadsheets/d/e/${SHEET_PUBLISHED_ID}/gviz/tq?tqx=out:json&callback=sheetCallback`;
+  script.onerror = () => showError('No se pudo conectar con Google Sheets.');
+  document.head.appendChild(script);
 }
 
 function loadFromSheetId(id) {
