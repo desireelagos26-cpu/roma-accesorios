@@ -714,18 +714,17 @@ function loadSheet() {
 }
 
 function loadFromPublishedCSV() {
-  showSpinner();
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywwfDcZMo8x3WUe4tFrFpK0_S9-Zn2CiU_3s1g51ToNPYc2uoifyB8yc11RK76ZgFk/exec';
-  fetch(APPS_SCRIPT_URL)
-    .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-    .then(products => {
-      if (!products.length) throw new Error('sin datos');
-      allProducts = products;
-      buildFilters();
-      renderProducts();
-      showToast('✅ Catálogo cargado');
-    })
-    .catch(() => showError('No se pudo conectar con Google Sheets.'));
+  // Productos cargados directamente (actualizar aquí cuando cambies el catálogo)
+  const PRODUCTOS = [
+    { nombre: 'Cartera Verde', precio: '10990', categoria: 'Cartera', descripcion: 'Cartera verde pequeña', foto: 'https://drive.google.com/file/d/1btYkJ2LKHRSDDmWsGJ5Tkraz2lTLBREP/view?usp=drive_link', stock: 'si' },
+    { nombre: 'Cartera Roja', precio: '10990', categoria: 'Cartera', descripcion: 'Cartera Roja', foto: 'https://drive.google.com/file/d/1hF6mcoR88mmw24qxk9N--WHXLDCmuqMe/view?usp=drive_link', stock: 'si' },
+    { nombre: 'Cartera Corazón', precio: '10990', categoria: 'Cartera', descripcion: 'Cartera Corazón', foto: 'https://drive.google.com/file/d/11L6Gpm9FtpYeB7f2iz5Sg3hj2G5Sxzhf/view?usp=drive_link', stock: 'si' },
+    { nombre: 'Cartera Estrella', precio: '10990', categoria: 'Cartera', descripcion: 'Cartera Estrella', foto: 'https://drive.google.com/file/d/1cnEvOpogbrAIs_jr9DVxy62Ym4pv5Rb6/view?usp=drive_link', stock: 'si' },
+  ];
+  allProducts = PRODUCTOS;
+  buildFilters();
+  renderProducts();
+  showToast('✅ Catálogo cargado');
 }
 
 function loadFromSheetId(id) {
