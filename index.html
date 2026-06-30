@@ -703,6 +703,7 @@ const DEMO = [
 
 // ─── CARGAR SHEET via JSONP nativo de Google (sin proxies externos) ───
 const SHEET_PUBLISHED_ID = '2PACX-1vTyG7kO-AfOglgjZwgxA7mS6rfDMpMx_eH3-wOAsYwQWDmc12BucENVozoVxWYRE4SsppD8mxlkVKRH';
+const SHEET_INTERNAL_ID = '1o1f7TC_uz5LDDxR5J-pn5rfA6C4R0U2C3ct6y3lmy2U';
 
 function loadSheet() {
   if (CONFIG.sheetId) {
@@ -744,7 +745,7 @@ function loadFromPublishedCSV() {
 
   const script = document.createElement('script');
   script.id = 'jsonp-sheet';
-  script.src = `https://docs.google.com/spreadsheets/d/e/${SHEET_PUBLISHED_ID}/gviz/tq?tqx=out:json&callback=sheetCallback`;
+  script.src = `https://docs.google.com/spreadsheets/d/${SHEET_INTERNAL_ID}/gviz/tq?tqx=out:json&callback=sheetCallback`;
   script.onerror = () => showError('No se pudo conectar con Google Sheets.');
   document.head.appendChild(script);
 }
