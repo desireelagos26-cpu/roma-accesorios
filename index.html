@@ -715,7 +715,7 @@ function loadSheet() {
 
 function loadFromPublishedCSV() {
   showSpinner();
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyw03IbRlPNIYCNgYek8OkoN6iHu-b5DqMmEKlDGBYYzsyDn9oq8QeF-C5eNnEnamwD/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywwfDcZMo8x3WUe4tFrFpK0_S9-Zn2CiU_3s1g51ToNPYc2uoifyB8yc11RK76ZgFk/exec';
   fetch(APPS_SCRIPT_URL)
     .then(r => { if (!r.ok) throw new Error(); return r.json(); })
     .then(products => {
